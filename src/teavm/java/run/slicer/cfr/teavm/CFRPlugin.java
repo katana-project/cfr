@@ -7,5 +7,6 @@ public class CFRPlugin implements TeaVMPlugin {
     @Override
     public void install(TeaVMHost host) {
         host.add(new MethodStubTransformer());
+        host.add(new MethodDelegationTransformer());
     }
 }

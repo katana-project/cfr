@@ -1,10 +1,10 @@
 [versions]
 cfr = "0.152"
-teavm = "0.14.0-SNAPSHOT"
+teavm = "0.16.0-dev-3"
 
 [libraries]
 cfr = { group = "org.benf", name = "cfr", version.ref = "cfr" }
-teavm-core = { group = "org.teavm", name = "teavm-core", version.ref = "teavm" }
+teavm-extension-annotation-processor = { group = "org.teavm", name = "teavm-extension-annotation-processor", version.ref = "teavm" }
 
 [plugins]
 teavm = { id = "org.teavm", version.ref = "teavm" }

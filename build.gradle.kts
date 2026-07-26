@@ -1,3 +1,6 @@
+import org.teavm.gradle.api.JSModuleType
+import org.teavm.gradle.api.OptimizationLevel
+
 plugins {
     `java-library`
     alias(libs.plugins.teavm) // order matters?
@@ -11,34 +14,49 @@ description = "A JavaScript port of the CFR decompiler."
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven("https://teavm.org/maven/repository")
 }
 
 dependencies {
     api(libs.cfr)
-    compileOnly(libs.teavm.core)
+    teavmAnnotationProcessor(libs.teavm.extension.annotation.processor) // hmm?
 }
 
 java.toolchain {
     languageVersion = JavaLanguageVersion.of(21)
 }
 
-teavm.wasmGC {
-    mainClass = "run.slicer.cfr.Main"
-    modularRuntime = true
-    /*obfuscated = false
-    optimization = org.teavm.gradle.api.OptimizationLevel.NONE
-    disassembly = true*/
+val debugging = false // set to true if you want an unobfuscated build for debugging
+teavm {
+    js {
+        mainClass = "run.slicer.cfr.Main"
+        moduleType = JSModuleType.ES2015
+        obfuscated = !debugging
+        if (debugging) {
+            optimization = OptimizationLevel.NONE
+        }
+    }
+
+    wasmGC {
+        mainClass = "run.slicer.cfr.Main"
+        modularRuntime = true
+        obfuscated = !debugging
+        disassembly = debugging
+        if (debugging) {
+            optimization = OptimizationLevel.NONE
+        }
+    }
 }
 
-/*tasks.disasmWasmGC {
-    html = false
-}*/
-
 tasks {
+    disasmWasmGC {
+        html = false
+    }
+
     register<Copy>("copyDist") {
         group = "build"
+        description = "Copies the necessary files to the dist directory for distribution."
+        dependsOn(generateJavaScript)
 
         from(
             "README.md", "LICENSE", "LICENSE-CFR", "cfr.js", "cfr.d.ts",
@@ -48,6 +66,15 @@ tasks {
 
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
+        doLast {
+            copy {
+                from(generateJavaScript)
+                into("dist")
+                rename("cfr.js", "cfr.runtime.js")
+
+                duplicatesStrategy = DuplicatesStrategy.INCLUDE
+            }
+        }
         doLast {
             file("dist/package.json").writeText(
                 """
