@@ -2,7 +2,6 @@ package run.slicer.cfr;
 
 import org.teavm.jso.JSBody;
 import org.teavm.jso.JSObject;
-import org.teavm.jso.core.JSPromise;
 import org.teavm.jso.typedarrays.Uint8Array;
 
 import java.util.HashMap;
@@ -21,8 +20,8 @@ public interface Options extends JSObject {
         return options;
     }
 
-    @JSBody(params = {"name"}, script = "return this.source ? this.source(name) : Promise.resolve(null);")
-    JSPromise<Uint8Array> source(String name);
+    @JSBody(params = {"name"}, script = "return this.source ? this.source(name) : null;")
+    Uint8Array source(String name);
 
     interface Option extends JSObject {
         @JSBody(script = "return this[0];")

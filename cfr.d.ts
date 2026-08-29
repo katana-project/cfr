@@ -2,7 +2,7 @@ declare module "@run-slicer/cfr" {
     export type Options = Record<string, string>;
 
     export interface Config {
-        source?: (name: string) => Promise<Uint8Array | null>;
+        source?: (name: string) => Uint8Array | null;
         options?: Options;
     }
 

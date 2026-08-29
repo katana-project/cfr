@@ -5,6 +5,7 @@ import org.teavm.model.instructions.ExitInstruction;
 import org.teavm.model.instructions.IntegerConstantInstruction;
 import org.teavm.model.instructions.NullConstantInstruction;
 
+import java.util.Arrays;
 import java.util.logging.Handler;
 
 public class MethodStubTransformer implements ClassHolderTransformer {
@@ -18,7 +19,34 @@ public class MethodStubTransformer implements ClassHolderTransformer {
             case "org.benf.cfr.reader.util.output.LoggerFactory" -> {
                 this.stubWithNullConstant(cls.getMethod(new MethodDescriptor("getHandler", Handler.class)));
             }
+            // TeaVM 0.15.0 removed the mapClass properties mechanism; the stock TLogger lacks the
+            // setters that CFR's LoggerFactory calls, which is a hard link error. Supply them as
+            // no-ops and let log output flow to the console as usual.
+            case "java.util.logging.Logger" -> {
+                this.stubVoidIfMissing(cls, "setUseParentHandlers", ValueType.BOOLEAN);
+                this.stubVoidIfMissing(cls, "setLevel", ValueType.object("java.util.logging.Level"));
+                this.stubVoidIfMissing(cls, "addHandler", ValueType.object("java.util.logging.Handler"));
+            }
         }
+    }
+
+    private void stubVoidIfMissing(ClassHolder cls, String name, ValueType... parameterTypes) {
+        final ValueType[] signature = Arrays.copyOf(parameterTypes, parameterTypes.length + 1);
+        signature[parameterTypes.length] = ValueType.VOID;
+
+        final var descriptor = new MethodDescriptor(name, signature);
+        if (cls.getMethod(descriptor) != null) {
+            return;
+        }
+
+        final MethodHolder method = new MethodHolder(descriptor);
+        method.setLevel(AccessLevel.PUBLIC);
+        method.setProgram(this.newProgram(parameterTypes.length));
+
+        final BasicBlock block = method.getProgram().createBasicBlock();
+        block.add(new ExitInstruction());
+
+        cls.addMethod(method);
     }
 
     private void stubWithNullConstant(MethodHolder method) {
