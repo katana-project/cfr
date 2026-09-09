@@ -31,7 +31,7 @@ public final class OutputSinkFactoryImpl implements OutputSinkFactory {
             });
             case EXCEPTION -> (s -> exceptions.add(
                     s instanceof SinkReturns.ExceptionMessage ex
-                            ? new RuntimeException(ex.getThrownException())
+                            ? ex.getThrownException()
                             : new RuntimeException(s.toString())
             ));
             default -> (s -> {

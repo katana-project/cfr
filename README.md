@@ -20,10 +20,8 @@ console.log(await decompile("your/package/HelloWorld", {
         /* see https://github.com/leibnitz27/cfr/blob/master/src/org/benf/cfr/reader/util/getopt/OptionsImpl.java#L274 */
         "hidelangimports": "false", /* testing option - don't hide java.lang imports */
     },
-}));
+})["your/package/HelloWorld"]);
 ```
-
-Or see the browser-based proof-of-concept in the [docs](./docs) directory.
 
 ## Licensing
 

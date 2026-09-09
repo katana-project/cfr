@@ -20,6 +20,9 @@ repositories {
 dependencies {
     api(libs.cfr)
     teavmAnnotationProcessor(libs.teavm.extension.annotation.processor) // hmm?
+    testImplementation(platform(libs.junit.bom))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java.toolchain {
@@ -96,6 +99,12 @@ tasks {
                 """.trimIndent()
             )
         }
+    }
+
+    test {
+        useJUnitPlatform()
+
+        dependsOn("copyDist") // comment out if you want to edit the output and test
     }
 
     build {
