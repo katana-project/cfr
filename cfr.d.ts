@@ -5,4 +5,4 @@ export interface Config {
     options?: Options;
 }
 
-export declare const decompile: (names: string | string[], config?: Config) => Promise<string>;
+export declare const decompile: (names: string | string[], config?: Config) => Promise<Record<string, string>>;

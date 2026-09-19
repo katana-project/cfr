@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.teavm) // order matters?
 }
 
-val thisVersion = "0.1.7"
+val thisVersion = "0.1.8"
 
 group = "run.slicer"
 version = "$thisVersion-${libs.versions.cfr.get()}"
